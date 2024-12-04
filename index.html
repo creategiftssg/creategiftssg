@@ -62,38 +62,17 @@
   <script>
     const url = 'https://sdk.photoroom.com/v1/segment';
     const apiKey = "sandbox_02efbb97a92a37f02f785bdf4b58426f2b86551b"; // Replace with your actual PhotoRoom API key
-    const imgurClientId = "224b027ad19158d"; // Replace with your actual Imgur Client ID
-    const imgurClientSecret = "d06e58b96122410828a5faf36672494509bd138f"; // Replace with your actual Imgur Client Secret
+    const imgurClientId = "224b027ad19158d"; // Replace with your Imgur Client ID (no need for client secret)
 
-    // Function to get the access token from Imgur
-    async function getImgurAccessToken() {
-        const auth = btoa(`${imgurClientId}:${imgurClientSecret}`); // Base64 encode Client ID and Client Secret
-
-        const response = await fetch('https://api.imgur.com/oauth2/token', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Basic ${auth}`,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: new URLSearchParams({
-                grant_type: 'client_credentials'
-            })
-        });
-
-        const data = await response.json();
-        return data.access_token;
-    }
-
-    // Function to upload the image blob to Imgur
+    // Function to upload the image blob to Imgur anonymously
     async function uploadImageToImgur(imageBlob) {
-        const accessToken = await getImgurAccessToken(); // Get the access token
         const formData = new FormData();
         formData.append('image', imageBlob); // Add the image blob to the form
 
         const response = await fetch('https://api.imgur.com/3/image', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${accessToken}`
+                'Authorization': `Client-ID ${imgurClientId}` // Use Client-ID for anonymous uploads
             },
             body: formData
         });
@@ -146,10 +125,9 @@
         // Listen for the file input change event
         imageInput.addEventListener('change', async (event) => {
             const imageFile = event.target.files[0];
-
+            triggerButton.classList.add('loading');
             if (imageFile) {
                 try {
-                    triggerButton.classList.add('loading');
                     // Remove the background using the PhotoRoom API
                     const { imageUrl, mime } = await removeBackground(imageFile);
 
@@ -159,9 +137,9 @@
                         url: imageUrl,
                         mime: mime
                     }, '*');
-                    triggerButton.classList.remove('loading');
+                    triggerButton.classList.add('loading');
                 } catch (error) {
-                    console.error('Error removing background:', error);
+                    alert('Error removing background, try reloading the page');
                 }
             }
         });
