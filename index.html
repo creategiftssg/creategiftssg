@@ -6,7 +6,27 @@
   <title>Create gifts</title>
 </head>
 <body>
+  <div id="message">Please select an image to remove the background.</div>
   <input type="file" id="imageInput" accept="image/*" style="display:none;">
+  <button id="triggerFileInput">Select Image</button>
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #message {
+      font-size: 22px;
+
+    }
+
+    #triggerFileInput  {
+      padding: 20px;
+      font-size: 16px;
+    }
+  </style>
   <script>
     const url = 'https://sdk.photoroom.com/v1/segment';
 
@@ -37,9 +57,15 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         const imageInput = document.getElementById('imageInput');
+        const triggerButton = document.getElementById('triggerFileInput');
 
-        // Automatically trigger the file input's click event when the page loads
-        imageInput.click();
+        // Show message or button after page loads
+        document.getElementById('message').style.display = 'block';
+
+        // Button click triggers the file input
+        triggerButton.addEventListener('click', () => {
+            imageInput.click(); // Trigger file input click event
+        });
 
         // Listen for the file input change event
         imageInput.addEventListener('change', async (event) => {
@@ -62,7 +88,6 @@
             }
         });
     });
-
   </script>
 </body>
 </html>
