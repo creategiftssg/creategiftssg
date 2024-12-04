@@ -36,7 +36,7 @@
   </style>
   <script>
     const url = 'https://sdk.photoroom.com/v1/segment';
-
+    console.log('asdfs');
     // Please replace with your own API key
     const apiKey = "sandbox_a16ad797899904af12e7a96128700cfa1535f3f0";
 
@@ -59,6 +59,7 @@
 
         const imageBlob = await response.blob();
         const imageUrl = URL.createObjectURL(imageBlob);
+        console.log(imageUrl);
         return { imageUrl, mime: imageBlob.type };
     }
 
