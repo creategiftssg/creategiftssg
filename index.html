@@ -8,7 +8,10 @@
 <body>
   <div id="message">Please select an image to remove the background.</div>
   <input type="file" id="imageInput" accept="image/*" style="display:none;">
-  <button id="triggerFileInput">Select Image</button>
+  <button id="triggerFileInput">
+    <span class="text">Select Image</span>
+    <img src="loading-icon.svg" class="loading-icon">
+  </button>
   <style>
     body {
       margin: 0;
@@ -19,6 +22,19 @@
       height: 100vh;
       gap: 25px;
       font-family: sans-serif;
+    }
+
+    .loading-icon {
+      display: none;
+      width: 35px;
+    }
+    
+    .loading .text {
+      display: none
+    }
+
+    .loading .loading-icon {
+      display: block;
     }
 
     #message {
@@ -32,11 +48,20 @@
       cursor: pointer;
       background-color: black;
       color: white;
+      outline: none;
+      border: navajowhite;
+      min-width: 201px;
+      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 70px;
+      box-shadow: 3px 3px 9px 0px black;
     }
   </style>
   <script>
     const url = 'https://sdk.photoroom.com/v1/segment';
-    const apiKey = "sandbox_a16ad797899904af12e7a96128700cfa1535f3f0"; // Replace with your actual PhotoRoom API key
+    const apiKey = "sandbox_02efbb97a92a37f02f785bdf4b58426f2b86551b"; // Replace with your actual PhotoRoom API key
     const imgurClientId = "224b027ad19158d"; // Replace with your actual Imgur Client ID
     const imgurClientSecret = "d06e58b96122410828a5faf36672494509bd138f"; // Replace with your actual Imgur Client Secret
 
@@ -124,6 +149,7 @@
 
             if (imageFile) {
                 try {
+                    triggerButton.classList.add('loading');
                     // Remove the background using the PhotoRoom API
                     const { imageUrl, mime } = await removeBackground(imageFile);
 
@@ -133,6 +159,7 @@
                         url: imageUrl,
                         mime: mime
                     }, '*');
+                    triggerButton.classList.remove('loading');
                 } catch (error) {
                     console.error('Error removing background:', error);
                 }
