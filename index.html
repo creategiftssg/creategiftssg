@@ -3,14 +3,66 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>Create gifts</title>
 </head>
 <body>
-  <h1>
-    This is create gifts.
-  </h1>
+  <input type="file" id="imageInput" accept="image/*" style="display:none;">
   <script>
-    console.log('asdfs');
+    const url = 'https://sdk.photoroom.com/v1/segment';
+
+    // Please replace with your own API key
+    const apiKey = "sandbox_a16ad797899904af12e7a96128700cfa1535f3f0";
+
+    async function removeBackground(imageFile) {
+        const formData = new FormData();
+        formData.append('image_file', imageFile);
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-Api-Key': apiKey
+            },
+            body: formData
+        });
+
+        if (!response.ok) {
+            console.error(await response.json());
+            throw new Error('Network response was not ok');
+        }
+
+        const imageBlob = await response.blob();
+        const imageUrl = URL.createObjectURL(imageBlob);
+        return { imageUrl, mime: imageBlob.type };
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const imageInput = document.getElementById('imageInput');
+
+        // Automatically trigger the file input's click event when the page loads
+        imageInput.click();
+
+        // Listen for the file input change event
+        imageInput.addEventListener('change', async (event) => {
+            const imageFile = event.target.files[0];
+
+            if (imageFile) {
+                try {
+                    // Remove the background using the PhotoRoom API
+                    const { imageUrl, mime } = await removeBackground(imageFile);
+
+                    // Send the image URL and MIME type to the parent iframe
+                    window.parent.postMessage({
+                        message_type: 'IMAGE_SELECTED',
+                        url: imageUrl,
+                        mime: mime
+                    }, '*');
+                } catch (error) {
+                    console.error('Error removing background:', error);
+                }
+            }
+        });
+    });
+
   </script>
 </body>
 </html>
