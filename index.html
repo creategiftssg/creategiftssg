@@ -6,7 +6,13 @@
   <title>Create gifts</title>
 </head>
 <body>
-  <div id="message">Please select an image to remove the background.</div>
+  <div id="message">
+    Please upload an image for background removal.<br>
+    For optimal processing times, we recommend images under 5MB.<br>
+    Images under 2MB will typically process in under 40 seconds.<br>
+    Images over 7MB may take longer than 1 minute to render.<br>
+    Thank you for your understanding.<br>
+  </div>
   <input type="file" id="imageInput" accept="image/*" style="display:none;">
   <button id="triggerFileInput">
     <span class="text">Select Image</span>
@@ -22,6 +28,7 @@
       height: 100vh;
       gap: 25px;
       font-family: sans-serif;
+      text-align: center;
     }
 
     .loading-icon {
@@ -39,6 +46,13 @@
 
     #message {
       font-size: 22px;
+
+    }
+
+    @media (max-width:768px) {
+      #message {
+        font-size: 14px
+      }
 
     }
 
@@ -61,8 +75,8 @@
   </style>
   <script>
   const asdf = 'https://sdk.photoroom.com/v1/segment';
-const jklsjdl = "02efbb97a92a37f02f785bdf4b58426f2b86551b"; // Replace with your actual PhotoRoom API key
-const kljkl45 = "97e75aced6ca9972c89465a37ec4e0ab"; // Replace with your actual ImgBB API key
+  const jklsjdl = "02efbb97a92a37f02f785bdf4b58426f2b86551b"; 
+  const kljkl45 = "97e75aced6ca9972c89465a37ec4e0ab";
 
 // Function to upload the image blob to ImgBB
 async function uploadImageToImgBB(imageBlob) {
@@ -135,6 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (imageFile) {
             try {
+                triggerButton.disabled = true;
                 triggerButton.classList.add('loading');
                 console.time('Total Processing Time');
                 // Remove the background using the PhotoRoom API
@@ -148,6 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, '*');
                 console.timeEnd('Total Processing Time');
                 triggerButton.classList.remove('loading');
+                triggerButton.disabled = false;
             } catch (error) {
                 console.error('Error removing background or uploading:', error);
             }
