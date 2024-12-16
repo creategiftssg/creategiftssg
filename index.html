@@ -18,6 +18,9 @@
     <span class="text">Select Image</span>
     <img src="loading-icon.svg" class="loading-icon">
   </button>
+  <div id="progressContainer" style="display: none;">
+    <div id="progressBar" style="width: 0%; height: 100%; background-color: #4c73c7; border-radius: 10px;transition: width .5s;"></div>
+  </div>
   <style>
     body {
       margin: 0;
@@ -37,7 +40,7 @@
     }
     
     .loading .text {
-      display: none
+      display: none;
     }
 
     .loading .loading-icon {
@@ -46,21 +49,19 @@
 
     #message {
       font-size: 22px;
-
     }
 
     @media (max-width:768px) {
       #message {
-        font-size: 14px
+        font-size: 14px;
       }
-
     }
 
     #triggerFileInput  {
       padding: 20px;
       font-size: 18px;
       cursor: pointer;
-      background-color: black;
+      background-color: #4c73c7;
       color: white;
       outline: none;
       border: navajowhite;
@@ -70,7 +71,16 @@
       justify-content: center;
       align-items: center;
       height: 70px;
-      box-shadow: 3px 3px 9px 0px black;
+      box-shadow: 3px 3px 9px 0px #4c73c7;
+    }
+
+    #progressContainer {
+      width: 95%;
+      height: 10px;
+      background-color: #ddd;
+      border-radius: 10px;
+      margin-top: 10px;
+      overflow: hidden;
     }
   </style>
   <script>
@@ -78,8 +88,15 @@
   const jklsjdl = "02efbb97a92a37f02f785bdf4b58426f2b86551b"; 
   const kljkl45 = "97e75aced6ca9972c89465a37ec4e0ab";
 
+// Function to update the progress bar
+function updateProgressBar(progress) {
+    const progressBar = document.getElementById('progressBar');
+    progressBar.style.width = `${progress}%`;
+}
+
 // Function to upload the image blob to ImgBB
 async function uploadImageToImgBB(imageBlob) {
+    updateProgressBar(50); // Set progress to 50% when upload starts
     console.time('ImgBB Upload Time');
     const formData = new FormData();
     formData.append('image', imageBlob);
@@ -104,6 +121,7 @@ async function uploadImageToImgBB(imageBlob) {
 
 // Function to remove the background from the image using PhotoRoom API
 async function removeBackground(imageFile) {
+    updateProgressBar(20); // Set progress to 20% when processing starts
     console.time('PhotoRoom API Request Time');
     const formData = new FormData();
     formData.append('image_file', imageFile);
@@ -122,11 +140,13 @@ async function removeBackground(imageFile) {
         throw new Error('PhotoRoom API request failed');
     }
 
+    updateProgressBar(40); // Set progress to 40% when background removal is complete
     const imageBlob = await response.blob();
     console.log('Image Blob received from PhotoRoom API:', imageBlob);
 
     console.time('ImgBB Upload Total Time');
     const uploadedImageUrl = await uploadImageToImgBB(imageBlob); // Upload the image to ImgBB and get the URL
+    updateProgressBar(100); // Set progress to 100% when upload is complete
     console.timeEnd('ImgBB Upload Total Time');
     return { imageUrl: uploadedImageUrl, mime: imageBlob.type };
 }
@@ -134,6 +154,7 @@ async function removeBackground(imageFile) {
 document.addEventListener('DOMContentLoaded', () => {
     const imageInput = document.getElementById('imageInput');
     const triggerButton = document.getElementById('triggerFileInput');
+    const progressContainer = document.getElementById('progressContainer');
 
     // Show message or button after page loads
     document.getElementById('message').style.display = 'block';
@@ -151,7 +172,9 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 triggerButton.disabled = true;
                 triggerButton.classList.add('loading');
+                progressContainer.style.display = 'block';
                 console.time('Total Processing Time');
+                
                 // Remove the background using the PhotoRoom API
                 const { imageUrl, mime } = await removeBackground(imageFile);
 
@@ -162,10 +185,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     mime: mime
                 }, '*');
                 console.timeEnd('Total Processing Time');
+
                 triggerButton.classList.remove('loading');
                 triggerButton.disabled = false;
             } catch (error) {
                 console.error('Error removing background or uploading:', error);
+            } finally {
+                progressContainer.style.display = 'none';
+                updateProgressBar(0); // Reset progress bar
             }
         }
     });
@@ -174,3 +201,4 @@ document.addEventListener('DOMContentLoaded', () => {
   </script>
 </body>
 </html>
+  
